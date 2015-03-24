@@ -4,15 +4,19 @@ package fix.java.util.concurrent;
  * Created by Administrator on 2015/3/6.
  */
 public class ExceptionHelper {
+    public static void throwException(String taskName, Throwable ex) throws Exception {
+    	printException(taskName,ex);
+        throw new Exception(ex);
+    }
+
     public static void throwRuntimeException(String taskName, Throwable ex) throws RuntimeException {
-        System.err.println("Exception in executing: " + taskName + ". It will no longer be run!");
-        ex.printStackTrace();
-        Thread thread = Thread.currentThread();
-        if (thread.getUncaughtExceptionHandler() != null) {
-            thread.getUncaughtExceptionHandler().uncaughtException(thread, ex);
-        } else if(thread.getThreadGroup() != null){
-            thread.getThreadGroup().uncaughtException(thread,ex);
-        }
+    	printException(taskName,ex);
         throw new RuntimeException(ex);
+    }
+
+    public static void printException(String taskName, Throwable ex)  {
+    	Thread thread = Thread.currentThread();
+        System.err.println(String.format("Exception in thread \"%s\" %s %s", thread.toString(),ex.toString(),taskName));
+        ex.printStackTrace();
     }
 }

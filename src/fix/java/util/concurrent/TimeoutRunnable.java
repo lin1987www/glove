@@ -17,9 +17,9 @@ public class TimeoutRunnable implements Runnable {
 	private ExecutorService service = null;
 
 	public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit) {
-		this(task,timeout,unit,defaultService);
+		this(task, timeout, unit, defaultService);
 	}
-	
+
 	public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit,
 			ExecutorService service) {
 		if (task == null) {
@@ -35,9 +35,8 @@ public class TimeoutRunnable implements Runnable {
 	public void run() {
 		Future<?> future = service.submit(task);
 		try {
-			 future.get(timeout, unit);
+			future.get(timeout, unit);
 		} catch (Throwable ex) {
-			// this method will stop the running underlying task
 			future.cancel(true);
 			ExceptionHelper.throwRuntimeException(task.toString(), ex);
 		}

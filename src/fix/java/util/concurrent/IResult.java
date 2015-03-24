@@ -1,4 +1,4 @@
-package fix.java.util.concurrent.concurrent;
+package fix.java.util.concurrent;
 
 /**
  *  必須由最外面的 Runnable or Callable 來設定，這樣才能使得外部的 Timeout 跟 Retry Throwable 被抓到，有不會多重觸發的問題

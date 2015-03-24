@@ -29,7 +29,7 @@ public class RetryCallable<T> implements Callable<T> {
 				if (--retryTimes >= 0) {
 					continue;
 				} else {
-					ExceptionHelper.throwRuntimeException(task.toString(), ex);
+					ExceptionHelper.throwException(task.toString(), ex);
 				}
 			}
 		}

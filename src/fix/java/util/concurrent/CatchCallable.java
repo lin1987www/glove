@@ -21,7 +21,7 @@ public class CatchCallable<T> implements Callable<T> {
         try {
             returnedValue = task.call();
         } catch (Throwable ex) {
-            ExceptionHelper.throwRuntimeException(task.toString(), ex);
+            ExceptionHelper.throwException(task.toString(), ex);
         }
         return returnedValue;
     }

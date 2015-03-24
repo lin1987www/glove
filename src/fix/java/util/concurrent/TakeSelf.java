@@ -1,4 +1,4 @@
-package fix.java.util.concurrent.concurrent;
+package fix.java.util.concurrent;
 
 import java.util.concurrent.Callable;
 
@@ -8,7 +8,29 @@ import java.util.concurrent.Callable;
 public abstract class TakeSelf<T> implements Callable<TakeSelf<T>>, ITakeResult<T> {
     private T result;
     private Throwable ex;
-
+    // TakeSelfBuilder will set startTimeMillis and stopTimeMillis.
+	long startTimeMillis = 0;
+	long stopTimeMillis = 0;
+    
+	public long getStartTimeMillis(){
+		return startTimeMillis;
+	}
+	
+	public long getStopTimeMillis(){
+		return stopTimeMillis;
+	}
+	
+	public long getElapsedTimeMillis(){
+		return stopTimeMillis - startTimeMillis;
+	}
+	
+    public T getResult(T defaultValue) {
+    	if(isSuccess()){
+    		return result;
+    	}
+        return defaultValue;
+    }
+	
     @Override
     public T getResult() throws Throwable {
         return result;
@@ -31,7 +53,18 @@ public abstract class TakeSelf<T> implements Callable<TakeSelf<T>>, ITakeResult<
 
     @Override
     public TakeSelf<T> call() throws Exception {
-        result = take();
+        while (true) {
+            try {
+            	result = take();
+                break;
+            } catch (Throwable ex) {
+                if (handleException(ex)) {
+                    continue;
+                }else {
+                    ExceptionHelper.throwException(this.toString(), ex);
+                }
+            }
+        }
         return this;
     }
 }

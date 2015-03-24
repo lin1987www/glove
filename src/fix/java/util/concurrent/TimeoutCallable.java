@@ -10,16 +10,17 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2015/3/8.
  */
 public class TimeoutCallable<T> implements Callable<T> {
-	private final static ExecutorService defaultService = Executors.newCachedThreadPool();
+	private final static ExecutorService defaultService = Executors
+			.newCachedThreadPool();
 	private Callable<T> task;
 	private long timeout;
 	private TimeUnit unit;
 	private ExecutorService service = null;
 
 	public TimeoutCallable(Callable<T> task, long timeout, TimeUnit unit) {
-		this(task,timeout,unit,defaultService);
+		this(task, timeout, unit, defaultService);
 	}
-	
+
 	public TimeoutCallable(Callable<T> task, long timeout, TimeUnit unit,
 			ExecutorService service) {
 		if (task == null) {
@@ -38,9 +39,8 @@ public class TimeoutCallable<T> implements Callable<T> {
 		try {
 			returnedValue = future.get(timeout, unit);
 		} catch (Throwable ex) {
-			// this method will stop the running underlying task
 			future.cancel(true);
-			ExceptionHelper.throwRuntimeException(task.toString(), ex);
+			ExceptionHelper.throwException(task.toString(), ex);
 		}
 		return returnedValue;
 	}
