@@ -1,6 +1,7 @@
 package fix.java.util.concurrent;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -15,6 +16,12 @@ public abstract class Take<T> implements Callable<Take<T>>, IHandleException {
     protected AtomicBoolean mCompleted = new AtomicBoolean(false);
     protected Throwable ex;
     protected String tag;
+
+    private List<TakeCancelListener> takeCancelListeners = new ArrayList<TakeCancelListener>();
+
+    public void addTakeCancelListener(TakeCancelListener listener) {
+        takeCancelListeners.add(listener);
+    }
 
     public long getStartTimeMillis() {
         return startTimeMillis;
@@ -37,7 +44,13 @@ public abstract class Take<T> implements Callable<Take<T>>, IHandleException {
     }
 
     public void cancel() {
-        mCancelled.set(true);
+//        if (mCancelled.getAndSet(true)) {
+//            throw new RuntimeException("Only cancel one time!");
+//        }
+        for (TakeCancelListener listener : takeCancelListeners) {
+            listener.takeCancel();
+        }
+        takeCancelListeners.clear();
     }
 
     public Throwable getThrowable() {
@@ -56,10 +69,6 @@ public abstract class Take<T> implements Callable<Take<T>>, IHandleException {
         this.tag = tag.toString();
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
     public boolean equalsTag(String tag) {
         if (this.tag == null) {
             return false;
@@ -71,7 +80,15 @@ public abstract class Take<T> implements Callable<Take<T>>, IHandleException {
         return (ex == null) && isCompleted() && !isCancelled();
     }
 
+    /**
+     *   Don't use take() directly. Using takeSafe() instead of take().
+     * @return
+     * @throws Throwable
+     */
     public abstract T take() throws Throwable;
+
+    public void onCompleted() {
+    }
 
     public Take<T> call() throws Exception {
         while (true) {
@@ -89,6 +106,19 @@ public abstract class Take<T> implements Callable<Take<T>>, IHandleException {
                 }
             }
         }
+        onCompleted();
         return this;
+    }
+
+    public T takeSafe() {
+        try {
+            startTimeMillis = System.currentTimeMillis();
+            call();
+        } catch (Throwable ex) {
+            setThrowable(ex);
+        } finally {
+            stopTimeMillis = System.currentTimeMillis();
+        }
+        return (T) this;
     }
 }

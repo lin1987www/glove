@@ -65,7 +65,7 @@ public class ScheduledExecutorFix extends ScheduledThreadPoolExecutor {
     }
 
     public static <T> Callable<T> wrap(Callable<T> task) {
-        if (!(task instanceof CatchRunnable)) {
+        if (!(task instanceof CatchCallable)) {
             task = new CatchCallable<T>(task);
         }
         return task;

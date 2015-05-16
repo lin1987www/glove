@@ -3,7 +3,7 @@ package fix.java.util.concurrent;
 /**
  * Created by Administrator on 2015/3/6.
  */
-public class HandleReRunnable implements Runnable{
+public class HandleReRunnable implements Runnable {
     private IReRunnable task;
 
     public HandleReRunnable(IReRunnable task) {
@@ -22,7 +22,7 @@ public class HandleReRunnable implements Runnable{
             } catch (Throwable ex) {
                 if (task.handleException(ex)) {
                     continue;
-                }else {
+                } else {
                     ExceptionHelper.throwRuntimeException(task.toString(), ex);
                 }
             }

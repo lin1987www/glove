@@ -25,7 +25,7 @@ public class HandleReCallable<T> implements Callable<T> {
             } catch (Throwable ex) {
                 if (task.handleException(ex)) {
                     continue;
-                }else {
+                } else {
                     ExceptionHelper.throwException(task.toString(), ex);
                 }
             }

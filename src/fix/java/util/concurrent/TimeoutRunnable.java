@@ -9,36 +9,36 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2015/3/8.
  */
 public class TimeoutRunnable implements Runnable {
-	private final static ExecutorService defaultService = Executors
-			.newCachedThreadPool();
-	private Runnable task;
-	private long timeout;
-	private TimeUnit unit;
-	private ExecutorService service = null;
+    private final static ExecutorService defaultService = Executors
+            .newCachedThreadPool();
+    private Runnable task;
+    private long timeout;
+    private TimeUnit unit;
+    private ExecutorService service = null;
 
-	public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit) {
-		this(task, timeout, unit, defaultService);
-	}
+    public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit) {
+        this(task, timeout, unit, defaultService);
+    }
 
-	public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit,
-			ExecutorService service) {
-		if (task == null) {
-			throw new NullPointerException();
-		}
-		this.task = task;
-		this.timeout = timeout;
-		this.unit = unit;
-		this.service = service;
-	}
+    public TimeoutRunnable(Runnable task, long timeout, TimeUnit unit,
+                           ExecutorService service) {
+        if (task == null) {
+            throw new NullPointerException();
+        }
+        this.task = task;
+        this.timeout = timeout;
+        this.unit = unit;
+        this.service = service;
+    }
 
-	@Override
-	public void run() {
-		Future<?> future = service.submit(task);
-		try {
-			future.get(timeout, unit);
-		} catch (Throwable ex) {
-			future.cancel(true);
-			ExceptionHelper.throwRuntimeException(task.toString(), ex);
-		}
-	}
+    @Override
+    public void run() {
+        Future<?> future = service.submit(task);
+        try {
+            future.get(timeout, unit);
+        } catch (Throwable ex) {
+            future.cancel(true);
+            ExceptionHelper.throwRuntimeException(task.toString(), ex);
+        }
+    }
 }
